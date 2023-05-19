@@ -37,6 +37,12 @@ jobs:
         uses: actions/setup-python@v3
         with:
           python-version: 3.x
+          
+      - name: show mehod.json
+        run: cat method.json
+        
+      - name: show import.json
+        run: cat import.json
 
       - name: Transform JSON
         run: python ./codeql/transform.py data.json method.json import.json
