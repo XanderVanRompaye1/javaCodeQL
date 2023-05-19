@@ -13,11 +13,11 @@ def process_json_file(json_file_path, unique_entries):
 
         # Transform the data into the desired format
         for entry_tuple in json_data["#select"]["tuples"]:
-            filename, functionname = entry_tuple
-            entry = {"code": functionname, "sourcefile": filename}
+            filename, code, type = entry_tuple
+            entry = {"code": code, "sourcefile": filename, "type": type}
 
             # Convert the dictionary to a tuple
-            entry_tuple = (entry["code"], entry["sourcefile"])
+            entry_tuple = (entry["code"], entry["sourcefile"], entry["type"])
 
             # Check if the entry already exists in the set
             if entry_tuple not in unique_entries:
@@ -45,7 +45,7 @@ def main(json_file_paths):
         concurrent.futures.wait(futures)
 
     # Convert the set of tuples back to dictionaries
-    transformed_data = [{"code": entry[0], "sourcefile": entry[1]} for entry in unique_entries]
+    transformed_data = [{"code": entry[0], "sourcefile": entry[1], "type": entry[2]} for entry in unique_entries]
 
     # Create the output dictionary
     output_data = {"results": transformed_data}
