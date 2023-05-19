@@ -1,0 +1,1 @@
+./codeql/java/methodnames.ql,results1
