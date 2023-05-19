@@ -1,2 +1,2 @@
-./codeql/java/methodnames.ql,results1
-./codeql/java/imports.ql,results2
+./codeql/java/methodnames.ql,method
+./codeql/java/imports.ql,import
