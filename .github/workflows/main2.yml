@@ -27,7 +27,7 @@ jobs:
       - name: Run batch queries
         run: |
           # Generate the CodeQL database
-          codeql database create my-database --language=java --source-root=./
+          codeql database create my-database --language=java --source-root=./ --command="mvn clean compile"
           # Read the queries from queries.txt and execute them
           while IFS=, read -r query output; do
             codeql query run "$query" --database=my-database --output="$output.bqrs"
