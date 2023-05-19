@@ -36,8 +36,8 @@ def main(json_file_paths):
     # Initialize an empty set to store unique entries
     unique_entries = set()
 
-    # Process each JSON file concurrently
-    with concurrent.futures.ThreadPoolExecutor() as executor:
+    # Process each JSON file concurrently using multiple processes
+    with concurrent.futures.ProcessPoolExecutor() as executor:
         # Submit the processing of each JSON file to the executor
         futures = [executor.submit(process_json_file, json_file_path, unique_entries) for json_file_path in json_file_paths]
 
@@ -52,7 +52,7 @@ def main(json_file_paths):
 
     # Write the merged data to a new JSON file
     output_json_path = sys.argv[1]
-    
+
     with open(output_json_path, 'w') as output_json_file:
         json.dump(output_data, output_json_file)
 
