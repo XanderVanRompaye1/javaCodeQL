@@ -1,8 +1,9 @@
 import sys
 import json
 import concurrent.futures
+import os
 
-def process_json_file(json_file_path, unique_entries):
+def process_json_file(json_file_path, unique_entries, json_file_type):
     try:
         with open(json_file_path, 'r') as json_file:
             json_data = json.load(json_file)
@@ -13,11 +14,11 @@ def process_json_file(json_file_path, unique_entries):
 
         # Transform the data into the desired format
         for entry_tuple in json_data["#select"]["tuples"]:
-            filename, code, type = entry_tuple
-            entry = {"code": code, "sourcefile": filename, "type": type}
+            filename, functionname = entry_tuple
+            entry = {"input": functionname, "type": json_file_type, "sourcefile": filename}
 
             # Convert the dictionary to a tuple
-            entry_tuple = (entry["code"], entry["sourcefile"], entry["type"])
+            entry_tuple = (entry["input"], entry["type"], entry["sourcefile"])
 
             # Check if the entry already exists in the set
             if entry_tuple not in unique_entries:
@@ -36,23 +37,27 @@ def main(json_file_paths):
     # Initialize an empty set to store unique entries
     unique_entries = set()
 
-    # Process each JSON file concurrently using multiple processes
-    with concurrent.futures.ProcessPoolExecutor() as executor:
+    # Process each JSON file concurrently
+    with concurrent.futures.ThreadPoolExecutor() as executor:
         # Submit the processing of each JSON file to the executor
-        futures = [executor.submit(process_json_file, json_file_path, unique_entries) for json_file_path in json_file_paths]
+        futures = []
+        for json_file_path in json_file_paths:
+            json_file_type = os.path.splitext(json_file_path.split('/')[-1])[0]
+            future = executor.submit(process_json_file, json_file_path, unique_entries, json_file_type)
+            futures.append(future)
 
         # Wait for all the submitted tasks to complete
         concurrent.futures.wait(futures)
 
     # Convert the set of tuples back to dictionaries
-    transformed_data = [{"code": entry[0], "sourcefile": entry[1], "type": entry[2]} for entry in unique_entries]
+    transformed_data = [{"input": entry[0], "type": entry[1], "sourcefile": entry[2]} for entry in unique_entries]
 
     # Create the output dictionary
     output_data = {"results": transformed_data}
 
     # Write the merged data to a new JSON file
     output_json_path = sys.argv[1]
-
+    
     with open(output_json_path, 'w') as output_json_file:
         json.dump(output_data, output_json_file)
 
