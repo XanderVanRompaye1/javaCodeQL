@@ -34,7 +34,7 @@ public class User {
       e.printStackTrace();
       throw new Unauthorized(e.getMessage());
     }
-  }
+  }   
 
   public static User fetch(String un) {
     Statement stmt = null;
